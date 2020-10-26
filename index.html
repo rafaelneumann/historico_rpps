@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=">
+  <title>Histórico de Regimes Próprios</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="consts.js"></script>
+  <style>
+    #search {
+		text-transform: uppercase;
+		}
+  </style>
+
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-wrapper teal lighten-2">
+      <form onsubmit="procurar(event);">
+        <div class="input-field">
+          <input id="search" type="search" required>
+          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+      </form>
+    </div>
+  </nav>
+
+  <main>
+    <table class="centered">
+      <thead>
+        <tr>
+          <th>CNPJ</th>
+          <th>UF</th>
+          <th>Ente</th>
+          <th>Regime</th>
+          <th>Início do Regime</th>
+          <th>Fim do Regime</th>
+		  <th>...</th>
+        </tr>
+      </thead>
+      <tbody id="resultados"></tbody>
+    </table>
+	
+	<!-- Modal Structure -->
+	<div id="modal" class="modal">
+      <div id="moreinfo" class="modal-content"></div>
+      <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">FECHAR</a>
+    </div>
+  </div>
+
+  </main>
+
+  <script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const elems = document.querySelectorAll('.modal');
+		const instances = M.Modal.init(elems, {});
+	});
+
+	function criar_modal(i) {
+		const infos = csv_data[i].split(',');
+		const infos_cabecalho = csv_data[0].split(',');
+		
+		const html = document.getElementById("moreinfo");
+		html.innerHTML = "";
+		
+		for (let i = 0; i < infos.length; i++ ){
+			html.innerHTML += '<p>' + infos_cabecalho[i] + ': ' + infos[i] + '<p>'
+		}		
+	}
+	
+	function procurar(event) {
+		event.preventDefault();
+		const html = document.getElementById("resultados");
+		const termo = document.getElementById("search").value.toUpperCase();
+		html.innerHTML = "";
+		
+		console.log(csv_data.length);
+		
+		let txt = '';
+		
+		for (let i = 0; i < csv_data.length; i++){
+			if (csv_data[i].toUpperCase().indexOf(termo) > -1) {
+				txt += '<tr>';
+				let line = csv_data[i].split(',');
+				
+				for (let j = 0; j < 6; j++) {
+					txt += '<td>' + line[j].replace(" 00:00:00", "") + '</td>';
+					}
+				txt += '<td><a class="waves-effect waves-light btn modal-trigger" href="#modal" onclick="criar_modal(' + i + ');"><i class="material-icons">add_circle_outline</i></a><td></tr>';
+				
+				html.innerHTML += txt;
+			}
+		}
+		
+		return true;
+	}
+  </script>
+</body>
+
+</html>
