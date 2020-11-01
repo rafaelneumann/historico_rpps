@@ -10,28 +10,48 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script src="consts.js"></script>
   <style>
+    h1 {
+      font-size: 3rem;
+    }
+
     #search {
-		text-transform: uppercase;
-		}
+      text-transform: uppercase;
+    }
+
+    .search-wrapper {
+      color: #777;
+      margin-top: -1px;
+      border-top: 1px solid rgba(0, 0, 0, 0.14);
+      -webkit-transition: margin .25s ease;
+      transition: margin .25s ease
+    }
   </style>
 
 </head>
 
 <body>
 
-  <nav>
-    <div class="nav-wrapper teal lighten-2">
+  <header class="center">
+    <h1>Histórico de Regimes Próprios</h1>
+    <p>Pesquisa na base de dados informada em 06/10/2020 pela Secretaria Especial de Previdência e Trabalho, <a
+        href="https://www.gov.br/previdencia/pt-br/assuntos/previdencia-no-servico-publico/estatisticas-e-informacoes-dos-rpps-1/estatisticas-e-informacoes-dos-rpps"
+        target="_blank">disponível aqui</a>, do Ministério da Economia.</p>
+  </header>
+
+  <main class="container">
+
+    <div class="row">
       <form onsubmit="procurar(event);">
-        <div class="input-field">
-          <input id="search" type="search" required>
-          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-          <i class="material-icons">close</i>
+        <div class="input-field col s10">
+          <input id="search" type="text">
+          <label for="search">Sua pesquisa</label>
         </div>
+        <button class="waves-effect waves-light btn col s2">Procurar</button>
       </form>
     </div>
-  </nav>
 
-  <main>
+    <p id="obs"></p>
+
     <table class="centered">
       <thead>
         <tr>
@@ -41,66 +61,76 @@
           <th>Regime</th>
           <th>Início do Regime</th>
           <th>Fim do Regime</th>
-		  <th>...</th>
+          <th>...</th>
         </tr>
       </thead>
       <tbody id="resultados"></tbody>
     </table>
-	
-	<!-- Modal Structure -->
-	<div id="modal" class="modal">
+
+    <!-- Modal Structure -->
+    <div id="modal" class="modal">
       <div id="moreinfo" class="modal-content"></div>
       <div class="modal-footer">
-      <a href="#!" class="modal-close waves-effect waves-green btn-flat">FECHAR</a>
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">FECHAR</a>
+      </div>
     </div>
-  </div>
 
   </main>
 
   <script>
-	document.addEventListener('DOMContentLoaded', function() {
-		const elems = document.querySelectorAll('.modal');
-		const instances = M.Modal.init(elems, {});
-	});
+    document.addEventListener('DOMContentLoaded', function () {
+      const elems = document.querySelectorAll('.modal');
+      const instances = M.Modal.init(elems, {});
+    });
 
-	function criar_modal(i) {
-		const infos = csv_data[i].split(',');
-		const infos_cabecalho = csv_data[0].split(',');
-		
-		const html = document.getElementById("moreinfo");
-		html.innerHTML = "";
-		
-		for (let i = 0; i < infos.length; i++ ){
-			html.innerHTML += '<p>' + infos_cabecalho[i] + ': ' + infos[i] + '<p>'
-		}		
-	}
-	
-	function procurar(event) {
-		event.preventDefault();
-		const html = document.getElementById("resultados");
-		const termo = document.getElementById("search").value.toUpperCase();
-		html.innerHTML = "";
-		
-		console.log(csv_data.length);
-		
-		let txt = '';
-		
-		for (let i = 0; i < csv_data.length; i++){
-			if (csv_data[i].toUpperCase().indexOf(termo) > -1) {
-				txt += '<tr>';
-				let line = csv_data[i].split(',');
-				
-				for (let j = 0; j < 6; j++) {
-					txt += '<td>' + line[j].replace(" 00:00:00", "") + '</td>';
-					}
-				txt += '<td><a class="waves-effect waves-light btn modal-trigger" href="#modal" onclick="criar_modal(' + i + ');"><i class="material-icons">add_circle_outline</i></a><td></tr>';
-				
-				html.innerHTML += txt;
-			}
-		}
-		
-		return true;
-	}
+    function criar_modal(i) {
+      const infos = csv_data[i].split('\t');
+      const infos_cabecalho = csv_data[0].split('\t');
+
+      const html = document.getElementById("moreinfo");
+      html.innerHTML = "";
+
+      for (let i = 0; i < infos.length; i++) {
+        html.innerHTML += '<p>' + infos_cabecalho[i] + ': <b>' + infos[i] + '</b><p>'
+      }
+    }
+
+    function procurar(event) {
+      event.preventDefault();
+      const html = document.getElementById("resultados");
+      const termo = document.getElementById("search").value.toUpperCase();
+      html.innerHTML = "";
+
+      let total = 0;
+      let listadas = 0;
+
+      for (let i = 1; i < csv_data.length; i++) {
+        let txt = '';
+        
+        if (csv_data[i].toUpperCase().indexOf(termo) > -1) {
+          if (total++ > 99) {
+            continue;
+          } else {
+            listadas++;
+          }
+
+          txt += '<tr>';
+
+          let line = csv_data[i].split('\t');
+
+          for (let j = 0; j < 6; j++) {
+            txt += '<td>' + line[j] + '</td>';
+          }
+          txt += '<td><a class="waves-effect waves-light btn modal-trigger" href="#modal" onclick="criar_modal(' + i + ');"><i class="material-icons">add_circle_outline</i></a><td></tr>';
+
+          html.innerHTML += txt;
+        }
+      }
+
+      document.getElementById("obs").innerHTML = `<b>Listadas ${listadas} entradas de ${total} encontradas.</b> A pesquisa é sensível à acentuação, de modo que SÃO é diferente de SAO.`;
+
+      return true;
+    }
   </script>
 </body>
 
