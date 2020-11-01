@@ -6,3 +6,6 @@ A página html está disponível [aqui](https://rafaelneumann.github.io/historic
 ## Estrutura
 
 O arquivo html contém o mínimo de CSS e todo o código Javascript, mas a base de dados disponível em _xlsx_ foi tranformada em um arquivo _tsv_, depois transformado em ASCII URL seguro e em seguida base 64. Esse formato é suficiente para que não seja necessária uma base de dados. O navegador do cliente executa todos processamentos.
+
+## Fonte de informação
+[Página da SEPRT do ME](https://www.gov.br/previdencia/pt-br/assuntos/previdencia-no-servico-publico/estatisticas-e-informacoes-dos-rpps-1/estatisticas-e-informacoes-dos-rpps)
