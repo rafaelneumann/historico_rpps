@@ -12,21 +12,13 @@
   <style>
     h1 {
       font-size: 3rem;
+      margin: 5px;
     }
 
-    #search {
+    #procura {
       text-transform: uppercase;
     }
-
-    .search-wrapper {
-      color: #777;
-      margin-top: -1px;
-      border-top: 1px solid rgba(0, 0, 0, 0.14);
-      -webkit-transition: margin .25s ease;
-      transition: margin .25s ease
-    }
   </style>
-
 </head>
 
 <body>
@@ -42,9 +34,43 @@
 
     <div class="row">
       <form onsubmit="procurar(event);">
-        <div class="input-field col s10">
-          <input id="search" type="text">
-          <label for="search">Sua pesquisa</label>
+        <div class="input-field col s1">
+          <select id="uf">
+            <option value="Todas" selected>Todas</option>
+            <option value="AC">AC</option>
+            <option value="AL">AL</option>
+            <option value="AM">AM</option>
+            <option value="AP">AP</option>
+            <option value="BA">BA</option>
+            <option value="CE">CE</option>
+            <option value="DF">DF</option>
+            <option value="ES">ES</option>
+            <option value="GO">GO</option>
+            <option value="MA">MA</option>
+            <option value="MG">MG</option>
+            <option value="MS">MS</option>
+            <option value="MT">MT</option>
+            <option value="PA">PA</option>
+            <option value="PB">PB</option>
+            <option value="PE">PE</option>
+            <option value="PI">PI</option>
+            <option value="PR">PR</option>
+            <option value="RJ">RJ</option>
+            <option value="RN">RN</option>
+            <option value="RO">RO</option>
+            <option value="RR">RR</option>
+            <option value="RS">RS</option>
+            <option value="SC">SC</option>
+            <option value="SE">SE</option>
+            <option value="SP">SP</option>
+            <option value="TO">TO</option>
+          </select>
+          <label for="uf">UF</label>
+        </div>
+
+        <div class="input-field col s9">
+          <input id="procura" type="text">
+          <label for="procura">Sua pesquisa</label>
         </div>
         <button class="waves-effect waves-light btn col s2">Procurar</button>
       </form>
@@ -78,9 +104,16 @@
   </main>
 
   <script>
+    // Modal
     document.addEventListener('DOMContentLoaded', function () {
       const elems = document.querySelectorAll('.modal');
       const instances = M.Modal.init(elems, {});
+    });
+
+    // UFs
+    document.addEventListener('DOMContentLoaded', function () {
+      let elems = document.querySelectorAll('select');
+      let instances = M.FormSelect.init(elems, {});
     });
 
     function criar_modal(i) {
@@ -97,8 +130,11 @@
 
     function procurar(event) {
       event.preventDefault();
+
       const html = document.getElementById("resultados");
-      const termo = document.getElementById("search").value.toUpperCase();
+      const termo = document.getElementById("procura").value.toUpperCase();
+      const uf = document.getElementById("uf").value;
+
       html.innerHTML = "";
 
       let total = 0;
@@ -106,7 +142,11 @@
 
       for (let i = 1; i < csv_data.length; i++) {
         let txt = '';
-        
+
+        if (uf !== "Todas" && csv_data[i].indexOf('\t' + uf + '\t') === -1) {
+          continue;
+        }
+
         if (csv_data[i].toUpperCase().indexOf(termo) > -1) {
           if (total++ > 99) {
             continue;
